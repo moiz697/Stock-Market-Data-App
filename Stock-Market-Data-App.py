@@ -3,7 +3,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import random
 
-api_key = 'B9ZJSXS10G3LVC0R'
+api_key = '6XCFUOW5JB5B23H2'
 
 def get_realtime_stock_data(symbol):
     url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={symbol}&apikey={api_key}'
@@ -23,19 +23,35 @@ def get_realtime_stock_data(symbol):
             st.write(f"Previous Close: {stock_info['08. previous close']}")
             st.write(f"Change: {stock_info['09. change']}")
             st.write(f"Change Percent: {stock_info['10. change percent']}")
+                 
+            close_price = float(stock_info['08. previous close'])
+            current_price = float(stock_info['05. price'])
+            average_price = (close_price + current_price) / 2
 
+            st.write(f"Closing Price Average: {average_price}")
             # Plot the real-time price using matplotlib
             prices = [float(stock_info['02. open']), float(stock_info['03. high']), float(stock_info['04. low']), float(stock_info['05. price'])]
             labels = ['Open', 'High', 'Low', 'Price']
 
-            plt.bar(labels, prices)
-            plt.xlabel('Price Type')
-            plt.ylabel('Price')
-            plt.title(f"{symbol} Real-Time Stock Prices")
+            fig, ax = plt.subplots()
+            ax.bar(labels, prices)
+            ax.set_xlabel('Price Type')
+            ax.set_ylabel('Price')
+            ax.set_title(f"{symbol} Real-Time Stock Prices")
             plt.tight_layout()
 
             # Display the graph
-            st.pyplot(plt)
+            st.pyplot(fig)
+
+            # Plot a pie chart of price type distribution
+            fig2, ax2 = plt.subplots()
+            types = ['Open', 'High', 'Low', 'Price']
+            ax2.pie(prices, labels=types, autopct='%1.1f%%')
+            ax2.set_title(f"{symbol} Price Type Distribution")
+            plt.tight_layout()
+
+            # Display the pie chart
+            st.pyplot(fig2)
 
             # Track the symbol
             track_symbol(symbol)
